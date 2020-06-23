@@ -1,0 +1,9 @@
+Compile with 'make'
+
+Run with './TSP.exe'
+
+Remove the .o and the executable with 'make clean'
+
+Remove the output files (but the ones used for the plots in the notebook) with './clean.sh'
+
+You can modify the parameters N and n_i from 'TSP.h' and beta_i from 'TSP.cpp'. You can als choose whether to èlace the cities on a circumference or inside a square by commenting the complementary lines in the fucntion Initialize of 'TSP.cpp'

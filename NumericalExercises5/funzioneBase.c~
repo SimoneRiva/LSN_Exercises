@@ -1,0 +1,18 @@
+#include "funzioneBase.h"
+using namespace std;
+
+Parabola :: Parabola (double a, double b, double c) {
+
+	_a=a;
+	_b=b;
+	_c=c;
+	
+	}
+
+Parabola::Parabola () {
+	_a=0;
+	_b=0;
+	_c=0;
+	}
+
+Parabola::~Parabola() { }

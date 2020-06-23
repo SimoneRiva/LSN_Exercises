@@ -1,0 +1,11 @@
+compile with 'make'
+
+Run with './Monte_Carlo_NVT.exe'
+
+Remove .o and the executable with 'make clean'
+
+copy 'config.final' into 'config.0' to restart from the previous final configuration, otherwise copy 'config.fcc' to start from a perfect fcc lattice
+
+The output files are contained in 'averages' and 'measures'. The first contains the blocking averages and the final shape of g(r), the latter contains the instaneous measures
+
+'./clean.sh' removes all these files plus 'config.final', 'seed.out' and the .xyz files in 'frame' in case you have printed them. It does not remove all the files containing 'solid', 'liquid' or 'gas' in their name, that are used to produce the plots in the jupyter notebook

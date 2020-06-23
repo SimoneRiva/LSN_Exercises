@@ -1,0 +1,123 @@
+#include <fstream>
+#include <vector>
+#include <iostream>
+#include <cmath>
+#include "time.h"
+#include "random.h"
+#include "error.h"
+#include "funzioneBase.h"
+
+using namespace std;
+
+int main (){
+
+
+   Random rnd;
+   int seed[4];
+   int p1, p2;
+   ifstream Primes("Primes");
+   if (Primes.is_open()){
+      Primes >> p1 >> p2 ;
+   } else cerr << "PROBLEM: Unable to open Primes" << endl;
+   Primes.close();
+
+   ifstream input("seed.in");
+   string property;
+   if (input.is_open()){
+      while ( !input.eof() ){
+         input >> property;
+         if( property == "RANDOMSEED" ){
+            input >> seed[0] >> seed[1] >> seed[2] >> seed[3];
+            rnd.SetRandom(seed,p1,p2);
+         }
+      }
+      input.close();
+   } else cerr << "PROBLEM: Unable to open seed.in" << endl;
+
+time_t t1, t2;
+time(&t1);
+
+	int M=1e6, N=100, L=(M/N), k;
+	double sumu, sumi;
+	double a=0., b=1., pmax=0.5*M_PI; // estremi di integrazione e max della distribuzione
+	vector<double> x;
+	vector<double> Iu (N,0.); // u=uniform sampling
+	vector<double> Iu2 (N,0.);
+	vector<double> sumu_prog (N,0.);
+	vector<double> sumu2_prog (N,0.);
+	vector<double> erru_prog (N,0.);
+	vector<double> Ii (N,0.); // i=sampling with p(x)=pi/2*(1-(1/2)*(pi*x/2)^2+(1/24)*(pi*x/2)^4)
+	vector<double> Ii2 (N,0.);
+	vector<double> sumi_prog (N,0.);
+	vector<double> sumi2_prog (N,0.);
+	vector<double> erri_prog (N,0.);
+	vector<double> ru, ri;
+	FunzioneBase *integ = new Integrand();
+	FunzioneBase *prob = new Probability();
+	double norm=0.5*M_PI*(1.-(pow(M_PI, 2)/24.)+(pow(M_PI, 4)/1920.)); // normalization pf p(x)
+
+
+	for (int h=0; h<N; h++) x.push_back(h*L);
+	for (int h=0; h<M; h++) {
+		ru.push_back(rnd.Rannyu(a, b));
+		ri.push_back(rnd.AccRej(prob, a, b, pmax));
+	}
+
+	for(int i=0; i<N; i++){
+		sumu=0;
+		sumi=0;
+		for (int j=0; j<L; j++){
+			k=j+i*L;
+			sumu += integ->Eval(ru[k]);
+			sumi += norm*(integ->Eval(ri[k]))/(prob->Eval(ri[k]));
+		}
+		Iu[i]=(b-a)*sumu/L;
+		Iu2[i]=Iu[i]*Iu[i];
+		Ii[i]=sumi/L;
+		Ii2[i]=Ii[i]*Ii[i];
+	}
+
+	for(int i=0; i<N; i++){
+		for (int j=0; j<(i+1); j++){
+			sumu_prog[i] += Iu[j];
+			sumu2_prog[i] += Iu2[j];
+			sumi_prog[i] += Ii[j];
+			sumi2_prog[i] += Ii2[j];
+		}
+		sumu_prog[i] /= (i+1);
+		sumu2_prog[i] /= (i+1);
+		erru_prog[i]=error(sumu_prog, sumu2_prog, i);
+		sumi_prog[i] /= (i+1);
+		sumi2_prog[i] /= (i+1);
+		erri_prog[i]=error(sumi_prog, sumi2_prog, i);
+	}
+
+	ofstream out;
+	out.open("results2.1.out");
+
+	for (int h=0; h<N; h++)
+		out << x[h] << "	" << (sumu_prog[h]-1.) << "	" << erru_prog[h] << "	" << (sumi_prog[h]-1.) << "	" << erri_prog[h] << endl;
+
+	out.close();
+
+
+
+
+	ofstream outb;
+	outb.open("accrejtest.out");
+
+	for (int h=0; h<M; h++)
+		outb << ri[h] << endl;
+
+	outb.close();
+
+
+time(&t2);
+cout << setprecision(2) << t2-t1 << "sec" << endl;
+
+
+   rnd.SaveSeed();
+	return 0;
+}
+
+

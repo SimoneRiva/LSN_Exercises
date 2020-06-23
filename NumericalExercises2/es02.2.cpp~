@@ -1,0 +1,98 @@
+#include <fstream>
+#include <vector>
+#include <iostream>
+#include <cmath>
+#include "random.h"
+#include "ranWalkStep.h"
+
+using namespace std;
+
+int main (){
+
+
+   Random rnd;
+   int seed[4];
+   int p1, p2;
+   ifstream Primes("Primes");
+   if (Primes.is_open()){
+      Primes >> p1 >> p2 ;
+   } else cerr << "PROBLEM: Unable to open Primes" << endl;
+   Primes.close();
+
+   ifstream input("seed.in");
+   string property;
+   if (input.is_open()){
+      while ( !input.eof() ){
+         input >> property;
+         if( property == "RANDOMSEED" ){
+            input >> seed[0] >> seed[1] >> seed[2] >> seed[3];
+            rnd.SetRandom(seed,p1,p2);
+         }
+      }
+      input.close();
+   } else cerr << "PROBLEM: Unable to open seed.in" << endl;
+
+
+	int M=1e4, N=100, L=(M/N), k;
+	int len=100; // random walk length (i.e. number of steps)
+	double a=1.; // random walk step
+	double l_d, l_c, ave_d, ave2_d, ave_c, ave2_c, err_d, err_c;
+
+	Vector3D ** RW_d = new Vector3D * [M]; // discrete random walk
+	Vector3D ** RW_c = new Vector3D * [M]; // continuum random walk
+	for(int h=0; h<M; h++){
+		RW_d[h] = new Vector3D ();
+		RW_c[h] = new Vector3D ();
+	}
+
+
+	ofstream out;
+	out.open("results2.2.out");
+
+	for(int step=1; step<len; step++){
+
+		for(int h=0; h<M; h++){
+			discRWStep(RW_d[h], a, rnd.Rannyu(0., 3.), rnd.Rannyu(0., 2.));
+			contRWStep(RW_c[h], a, acos(1.-2.*rnd.Rannyu()), rnd.Rannyu(0., 2.*M_PI));
+		}
+
+		ave_d=0.;
+		ave2_d=0.;
+		ave_c=0.;
+		ave2_c=0.;
+
+		for(int i=0; i<N; i++){
+			l_d=0;
+			l_c=0;
+			for (int j=0; j<L; j++){
+				k=j+i*L;
+				l_d += RW_d[k]->squareR();
+				l_c += RW_c[k]->squareR();
+			}
+			ave2_d+=l_d/L;
+			ave_d+=sqrt(l_d/L);
+			ave2_c+=l_c/L;
+			ave_c+=sqrt(l_c/L);
+		}
+
+		ave_d /= N;
+		ave2_d /= N;
+		err_d=sqrt((ave2_d-ave_d*ave_d)/N);
+		ave_c /= N;
+		ave2_c /= N;
+		err_c=sqrt((ave2_c-ave_c*ave_c)/N);
+
+
+		out << step << "	" << ave_d << "	" << err_d << "	" << ave_c << "	" << err_c << endl;
+
+	}
+
+	out.close();
+
+
+   rnd.SaveSeed();
+
+	return 0;
+}
+
+

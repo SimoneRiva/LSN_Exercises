@@ -1,0 +1,9 @@
+Compile with 'make'
+
+Run with './ex02.1.exe', './ex02.2.exe'
+
+Remove all .o, executables and output files with './clean.sh'
+
+ex02.1.exe produces 2 output files, 'uniform_sampling.out' and 'importance_sampling.out', containing the number of blocks, the integral estimation and its uncertainty. In addition it also produces 'accrejtest.out' if the comments are removed from the corresponding lines of 'ex02.1.cpp'. This contains the points sampled from the importance sampling chosen with the accept-reject method
+
+ex02.2.exe produces 2 output files, 'discrete_random_walk.out' and 'continuum_random_walk.out', containing the number of steps, the measure of L and its uncertainty

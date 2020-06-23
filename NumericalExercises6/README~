@@ -1,0 +1,17 @@
+Compile with 'make'
+
+Run with './Monte_Carlo_ISING_1D.exe'
+
+Remove .o and executables with 'make clean'
+
+'input.dat' must contain a restart boolean-like integer variable in the first line. If this variable is set to 1 the program will run a simulation starting from the configuration read from 'config.0', otherwise it will generate the starting configuration randomly
+
+By using 'make copy' you can copy the output file 'config.final' into 'config.0' to easily restart
+
+The execution of the program produces the files 'output/output.propertyname.0', containing the block number, block estimation, block average and uncertainty of the property after computing each block.
+
+All output files, including 'config.final' but not 'config.0', can be removed with './clean.sh'
+
+By running './data.exe' (compiled with 'make data') you can append the last two values of each file 'output/output.propertyname.0' to the corresponding file 'data/data.propertyname.dat', so that you can save the final averages and errors after each simulation (e.g. at different temperatures). These file are removed by './cleandata.sh'
+
+The files 'data/metro.propertyname.dat' and 'data/gibbs.propertyname.dat' contain the averages and uncertainties after performing simulations with a total of 2e5 Metropolis and Gibbs steps with nspin=50, J=1.0, h=0.0 (except for magnetization, which is measured with h=0.02) and increasing temp from 0.5 to 2.0 (by 0.1 each time). These are used to produce plots and are not removed by './cleandata.sh'

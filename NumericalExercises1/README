@@ -1,0 +1,14 @@
+Compile with 'make'
+
+Run with './ex01.1.exe', './ex01.2.exe', './ex01.3.exe'
+
+Remove all .o, executables and output files with './clean.sh'
+
+ex01.1.exe produces 3 output files:
+'ave_r.out' contains in 3 columns the number of throws, the blocking average of r up to that point and the corresponding uncertainty
+'var_r.out' contains the number of throws, the value of sigma up to that point and the corresponding uncertainty
+'square_chi' contains the 100 values of chi square calculated with different sets of random numbers
+
+ex01.2.exe produces 3 output files, 'reg_dice.out', 'exxp_dice.out' and 'cauchy_dice.out', containing in each line one evaluation of the averages computed on N=1,2,10,100 throws for a total of 1e4 lines
+
+ex01.3.exe produces 'pi.out', which contains in each line the number of blocks, the average pi computed up to that block and its uncertainty

@@ -1,0 +1,8 @@
+#ifndef __ERROR__
+#define __ERROR__
+
+#include <vector>
+
+double error(vector<double> av, vector<double> av2, int n);
+
+#endif

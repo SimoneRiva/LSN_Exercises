@@ -1,0 +1,25 @@
+#ifndef _datablocking_h_
+#define _datablocking_h_
+
+#include <vector>
+//#include "funzioneBase.h"
+
+using namespace std;
+
+int M=1e5; //Total throws
+int N=100; //# of blocks
+int L=(M/N); //Size of blocks
+int k;
+double sum;
+vector<double> x;
+//Blocking method quantities
+vector<double> ave (N,0.);
+vector<double> ave2 (N,0.);
+vector<double> sum_prog (N,0.);
+vector<double> sum2_prog (N,0.);
+vector<double> err_prog (N,0.);
+vector<double> r;
+
+void DataBlocking(BaseFunction * func);
+
+#endif

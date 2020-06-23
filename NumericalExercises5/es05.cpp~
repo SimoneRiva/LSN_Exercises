@@ -1,0 +1,182 @@
+#include <iostream>
+#include <fstream>
+#include <cmath>
+#include "random.h"
+#include "error.h"
+#include "funzioneBase.h"
+
+using namespace std;
+
+Random rnd;
+
+const int nstep=2e6, equilstep=1e4, nblocks=200, blocksize=nstep/nblocks;
+int step, accepted;
+double l, sigma;
+double x [3];
+
+
+double T (double * y, double * z);
+double A (double * y, double * z);
+void MetroStepUnif(FunzioneBase3D * p);
+void MetroStepGauss(FunzioneBase3D * p);
+
+ofstream out_points, out_radii;
+
+int main (){
+
+  int seed[4];
+  int p1, p2;
+  ifstream Primes("Primes");
+  if (Primes.is_open()){
+    Primes >> p1 >> p2 ;
+  } else cerr << "PROBLEM: Unable to open Primes" << endl;
+  Primes.close();
+
+  ifstream input("seed.in");
+  string property;
+  if (input.is_open()){
+    while ( !input.eof() ){
+      input >> property;
+      if( property == "RANDOMSEED" ){
+        input >> seed[0] >> seed[1] >> seed[2] >> seed[3];
+        rnd.SetRandom(seed,p1,p2);
+      }
+    }
+    input.close();
+  } else cerr << "PROBLEM: Unable to open seed.in" << endl;
+
+
+
+  FunzioneBase3D * s = new square_1s();
+  FunzioneBase3D * p = new square_2p();
+	double r [nblocks], av_r [nblocks], av2_r [nblocks], err_r [nblocks];
+	double sum;
+
+// 1s //
+
+	l=1.2;
+	sigma=0.63;
+
+  for(int i=0; i<3; i++)
+    x[i]=10.;
+
+	step=0.;
+  while(step<equilstep){
+    MetroStepGauss(s);
+	}
+
+	step=0;
+	accepted=0;
+	out_points.open("1s_points.out");
+	out_radii.open("1s_radii.out");
+  for(int iblock=0; iblock<nblocks; iblock++){
+		sum=0.;
+		av_r[iblock]=0.;
+		av2_r[iblock]=0.;
+		for(int i=0; i<blocksize; i++){
+   		MetroStepGauss(s);
+			sum += sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2]);
+			out_points << x[0] << "	" << x[1] << "	" << x[2] << endl;
+		}
+		r[iblock] = sum/blocksize;
+		for(int jblock=0; jblock<=iblock; jblock++){
+			av_r[iblock] += r[jblock];
+			av2_r[iblock] += r[jblock]*r[jblock];
+		}
+		av_r[iblock] /= (iblock+1);
+		av2_r[iblock] /= (iblock+1);
+		err_r[iblock] = error(av_r, av2_r, iblock);
+
+		out_radii << av_r[iblock] << "	" << err_r[iblock] << endl;
+	}
+	out_points.close();
+	out_radii.close();
+
+
+	cout << "The fraction of acceptance for the 1s orbital is " << double(accepted)/double(nstep) << endl;
+
+// 2p //
+
+	l=3.;
+	sigma=0.63;
+
+  for(int i=0; i<3; i++)
+    x[i]=10.;
+
+	step=0.;
+  while(step<equilstep){
+    MetroStepGauss(p);
+	}
+
+	step=0;
+	accepted=0;
+	out_points.open("2p_points.out");
+	out_radii.open("2p_radii.out");
+  for(int iblock=0; iblock<nblocks; iblock++){
+		sum=0.;
+		av_r[iblock]=0.;
+		av2_r[iblock]=0.;
+		for(int i=0; i<blocksize; i++){
+   		MetroStepGauss(p);
+			sum += sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2]);
+			out_points << x[0] << "	" << x[1] << "	" << x[2] << endl;
+		}
+		r[iblock] = sum/blocksize;
+		for(int jblock=0; jblock<=iblock; jblock++){
+			av_r[iblock] += r[jblock];
+			av2_r[iblock] += r[jblock]*r[jblock];
+		}
+		av_r[iblock] /= (iblock+1);
+		av2_r[iblock] /= (iblock+1);
+		err_r[iblock] = error(av_r, av2_r, iblock);
+
+		out_radii << av_r[iblock] << "	" << err_r[iblock] << endl;
+	}
+	out_points.close();
+	out_radii.close();
+
+
+	cout << "The fraction of acceptance for the 2p orbital is " << double(accepted)/double(nstep) << endl;
+
+  rnd.SaveSeed();
+	return 0;
+}
+
+
+double T (double * y, double * z){
+  if (sqrt((z[0]-y[0])*(z[0]-y[0])+(z[1]-y[1])*(z[1]-y[1])+(z[2]-y[2])*(z[2]-y[2]))<l) return 1./(2*l);
+  else return 0;
+}
+
+double A (double * y, double * z, FunzioneBase3D * p){
+  return min(1., (p->Eval(y)/p->Eval(z)));
+}
+
+void MetroStepUnif(FunzioneBase3D * p){
+  double y [3];
+  for(int i=0; i<3; i++)
+    y[i] = x[i]+l*rnd.Rannyu(-1,1);
+  double r = rnd.Rannyu(), alpha = A(y, x, p);
+  if(r<=alpha){
+    for(int i=0;i<3; i++)
+      x[i]=y[i];
+		accepted++;
+   }
+  step++;
+}
+
+
+void MetroStepGauss(FunzioneBase3D * p){
+  double y [3];
+  for(int i=0; i<3; i++)
+    y[i] = x[i]+l*rnd.Gauss(0., sigma);
+  double r = rnd.Rannyu(), alpha = A(y, x, p);
+  if(r<=alpha){
+    for(int i=0;i<3; i++)
+      x[i]=y[i];
+		accepted++;
+   }
+  step++;
+}
+
+

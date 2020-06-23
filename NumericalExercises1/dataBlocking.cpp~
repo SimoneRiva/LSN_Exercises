@@ -1,0 +1,29 @@
+#include "datBlocking.h"
+#include "error.h"
+#include "funzioneBase.h"
+
+using namespace std;
+
+void DataBlocking(BaseFunction * func){ //Performs the blocking averages of the quantity func(r), where r are the random vector elements
+	for(int i=0; i<N; i++){
+		sum=0;
+		for (int j=0; j<L; j++){
+			k=j+i*L;
+			sum += func->Eval(r[k]);
+		}
+		ave[i]=sum/L;
+		ave2[i]=ave[i]*ave[i];
+	}
+
+	for(int i=0; i<N; i++){
+		sum_prog[i]=0;
+		sum2_prog[i]=0;
+		for (int j=0; j<(i+1); j++){
+			sum_prog[i] += ave[j];
+			sum2_prog[i] += ave2[j];
+		}
+		sum_prog[i] /= (i+1);
+		sum2_prog[i] /= (i+1);
+		err_prog[i]=error(sum_prog, sum2_prog, i);
+	}
+}
