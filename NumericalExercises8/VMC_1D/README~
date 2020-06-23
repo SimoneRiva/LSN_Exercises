@@ -1,7 +1,0 @@
-Compile with 'make'
-
-Run with './VMC_1D.exe'
-
-Remove .o and executable with 'make clean'
-
-Remove all output files with './clean.sh'

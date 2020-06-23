@@ -1,4 +1,0 @@
-rm -rf data.ene.dat
-rm -rf data.heat.dat
-rm -rf data.mag.dat
-rm -rf data.chi.dat

@@ -1,7 +1,0 @@
-Compile with 'make'
-
-Run with 'ex05.5'
-
-Remove .o and executable with 'make clean'
-
-The output files are collected into 'points', containing all the points sampled during the simulation in cartesian coordinates (2e6 points), and 'radii', containing the average radii and uncertainties from data blocking.

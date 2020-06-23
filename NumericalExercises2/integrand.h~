@@ -1,6 +1,0 @@
-#ifndef __INTEGRAND__
-#define __INTEGRAND__
-
-double integrand(double x);
-
-#endif
