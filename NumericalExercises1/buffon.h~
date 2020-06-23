@@ -1,8 +1,0 @@
-#ifndef __BUFFON__
-#define __BUFFON__
-
-using namespace std;
-
-int buffon (double d, double l, double x, double theta); // gives the results of the Buffon experiment with a needle of length l and a distance d between vertical lines and returns 1 if the needle intersects a line, 0 otherwise (gives a caution  message if d<l but still runs the experiment). The x coordinate of one end of the needle and the angle measured form the horizontal direction must be given.
-
-#endif
